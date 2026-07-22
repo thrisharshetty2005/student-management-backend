@@ -1,5 +1,7 @@
 import { Router } from "express";
 import StudentModel from "../../Model/StudentModel.js";
+import { send, setErrMsg } from "../../helper/responseHelper.js";
+import RESPONSE from "../../config/global.js";
 
 const router = Router();
 
@@ -8,10 +10,7 @@ router.post("/", async (req, res) => {
         const { name, rollno, phone, email } = req.body;
 
         if (!name) {
-            return res.status(400).json({
-                success: false,
-                message: "Name is required"
-            });
+            return send(res,setErrMsg(RESPONSE.REQUIRED,"name"))
         }
 
         if (!rollno) {
@@ -42,18 +41,12 @@ router.post("/", async (req, res) => {
             email,
         });
 
-        return res.status(200).json({
-            success: true,
-            message: "Student created successfully",
-        });
+        return send(res,RESPONSE.SUCCESS)
 
     } catch (error) {
         console.log("Create Student:", error);
 
-        return res.status(500).json({
-            success: false,
-            message: "Something went wrong",
-        });
+        return send(res,RESPONSE.UNK_ERR)
     }
 });
 
