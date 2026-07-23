@@ -14,7 +14,15 @@ const RESPONSE={
     },
     NOT_FOUND:{
         code: 400,
-        message: "Is not found"
+        message: "Is not found",
+    },
+    INVALID_ID:{
+        code: 300,
+        message: "invalid",
+    },
+    ALREADY_EXISTS:{
+        code: 700,
+        message:"Already exists",
     }
 };
 

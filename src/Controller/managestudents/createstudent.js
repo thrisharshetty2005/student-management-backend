@@ -9,31 +9,45 @@ router.post("/", async (req, res) => {
     try {
         const { name, rollno, phone, email } = req.body;
 
+        // Required field validations
         if (!name) {
-            return send(res,setErrMsg(RESPONSE.REQUIRED,"name"))
+            return send(res, setErrMsg(RESPONSE.REQUIRED, "name"));
         }
 
         if (!rollno) {
-            return res.status(400).json({
-                success: false,
-                message: "Roll No is required"
-            });
+            return send(res, setErrMsg(RESPONSE.REQUIRED, "rollno"));
         }
 
         if (!phone) {
-            return res.status(400).json({
-                success: false,
-                message: "Phone is required"
-            });
+            return send(res, setErrMsg(RESPONSE.REQUIRED, "phone"));
         }
 
         if (!email) {
-            return res.status(400).json({
-                success: false,
-                message: "Email is required"
-            });
+            return send(res, setErrMsg(RESPONSE.REQUIRED, "email"));
         }
 
+        // Email format validation
+        const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+        if (!emailRegex.test(email)) {
+            return send(res, setErrMsg(RESPONSE.INVALID_ID, "email"));
+        }
+
+        // Check if email already exists
+        const isEmailExist = await StudentModel.findOne({ email });
+
+        if (isEmailExist) {
+            return send(res, setErrMsg(RESPONSE.ALREADY_EXISTS, "Email"));
+        }
+
+        // Check if phone already exists
+        const isPhoneExist = await StudentModel.findOne({ phone });
+
+        if (isPhoneExist) {
+            return send(res, setErrMsg(RESPONSE.ALREADY_EXISTS, "Phone"));
+        }
+
+        // Create student
         await StudentModel.create({
             name,
             rollno,
@@ -41,12 +55,11 @@ router.post("/", async (req, res) => {
             email,
         });
 
-        return send(res,RESPONSE.SUCCESS)
+        return send(res, RESPONSE.SUCCESS);
 
     } catch (error) {
         console.log("Create Student:", error);
-
-        return send(res,RESPONSE.UNK_ERR)
+        return send(res, RESPONSE.UNK_ERR);
     }
 });
 

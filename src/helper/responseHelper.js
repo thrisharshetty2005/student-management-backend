@@ -9,6 +9,6 @@ export const send=(res,response,data={})=>{
 export const setErrMsg=(response,param)=>{
     return{
         code:response.code,
-        message:`${paran}${response.message}`,
+        message:`${param}${response.message}`,
     };
 };
