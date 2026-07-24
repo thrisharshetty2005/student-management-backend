@@ -1,7 +1,5 @@
 import { Router } from "express";
 import StudentModel from "../../Model/StudentModel.js";
-import { send, setErrMsg } from "../../helper/responseHelper.js";
-import RESPONSE from "../../config/global.js";
 import { upload } from "../../middleware/uploads.js";
 
 const router = Router();
@@ -9,92 +7,86 @@ const router = Router();
 const uploads = upload.single("image");
 
 router.post("/", (req, res) => {
+
     uploads(req, res, async (error) => {
         try {
-            
+
             if (error) {
-                return send(
-                    res,
-                    setErrMsg(RESPONSE.MULTER_ERR, error.message)
-                );
+                return res.status(400).json({
+                    success: false,
+                    message: error.message,
+                });
             }
 
-            
-            if (!req.file) {
-                return send(
-                    res,
-                    setErrMsg(RESPONSE.REQUIRED, "Image")
-                );
-            }
+            const { rollno, name, email, phone } = req.body;
 
-            const filename = req.file.filename;
-
-            const { name, rollno, phone, email } = req.body;
-
-            
-            if (!name) {
-                return send(res, setErrMsg(RESPONSE.REQUIRED, "Name"));
-            }
 
             if (!rollno) {
-                return send(res, setErrMsg(RESPONSE.REQUIRED, "Roll Number"));
+                return res.status(400).json({
+                    success: false,
+                    message: "Roll No is required",
+                });
             }
 
-            if (!phone) {
-                return send(res, setErrMsg(RESPONSE.REQUIRED, "Phone"));
+
+            if (!name) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Name is required",
+                });
             }
+
 
             if (!email) {
-                return send(res, setErrMsg(RESPONSE.REQUIRED, "Email"));
+                return res.status(400).json({
+                    success: false,
+                    message: "Email is required",
+                });
             }
 
-            
-            const emailRegex =
-                /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
-            if (!emailRegex.test(email)) {
-                return send(
-                    res,
-                    setErrMsg(RESPONSE.INVALID_ID, "Email")
-                );
+            if (!phone) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Phone is required",
+                });
             }
 
-            
-            const isEmailExist = await StudentModel.findOne({ email });
 
-            if (isEmailExist) {
-                return send(
-                    res,
-                    setErrMsg(RESPONSE.ALREADY_EXISTS, "Email")
-                );
+            let filename = "";
+
+            if (req.file) {
+                filename = req.file.filename;
             }
 
-            
-            const isPhoneExist = await StudentModel.findOne({ phone });
 
-            if (isPhoneExist) {
-                return send(
-                    res,
-                    setErrMsg(RESPONSE.ALREADY_EXISTS, "Phone")
-                );
-            }
-
-            
             await StudentModel.create({
-                name,
                 rollno,
-                phone,
+                name,
                 email,
+                phone,
                 image: filename,
             });
 
-            return send(res, RESPONSE.SUCCESS);
 
-        } catch (err) {
-            console.log("Create Student:", err);
-            return send(res, RESPONSE.UNK_ERR);
+            return res.status(200).json({
+                success: true,
+                message: "Student created successfully",
+            });
+
+
+        } catch (error) {
+
+            console.log("Create Student:", error);
+
+            return res.status(500).json({
+                success: false,
+                message: "Something went wrong",
+            });
         }
     });
+
 });
+
 
 export default router;
