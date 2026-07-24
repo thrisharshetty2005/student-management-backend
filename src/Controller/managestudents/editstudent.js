@@ -32,7 +32,7 @@ router.put("/", (req, res) => {
 
             const updates = {};
 
-            // Image is optional while editing
+            
             if (req.file) {
                 updates.image = req.file.filename;
             }

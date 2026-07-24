@@ -23,7 +23,8 @@ const RESPONSE={
     ALREADY_EXISTS:{
         code: 700,
         message:"Already exists",
-    },multer_err:{
+    },
+    multer_err:{
         code:100,
         message:"Empty"
     }
